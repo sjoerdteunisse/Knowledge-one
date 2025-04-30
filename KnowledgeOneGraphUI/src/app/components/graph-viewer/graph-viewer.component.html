@@ -1,0 +1,82 @@
+<div class="graph-viewer-container">
+  <!-- Header with search -->
+  <div class="header">
+    <div class="title">
+      <h1>Knowledge One Graph Visualizer</h1>
+    </div>
+    <div class="search-container">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search domains, graphs, and vertices</mat-label>
+        <input matInput [(ngModel)]="searchQuery" (keyup.enter)="search()">
+        <button *ngIf="searchQuery" matSuffix mat-icon-button aria-label="Clear" (click)="searchQuery=''">
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-icon matSuffix (click)="search()">search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Sidebar for navigation -->
+  <div class="sidebar">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Domains</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="domain-list">
+          <div *ngFor="let domain of domains" 
+               [class.selected]="selectedDomain?.id === domain.id"
+               class="domain-item" 
+               (click)="loadDomainGraph(domain)">
+            {{ domain.name }}
+          </div>
+          <div *ngIf="domains.length === 0 && !isLoading" class="no-data">
+            No domains available
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card *ngIf="selectedDomain?.graphs?.length">
+      <mat-card-header>
+        <mat-card-title>Graphs in {{ selectedDomain?.name }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="graph-list">
+          <div *ngFor="let graph of selectedDomain?.graphs" 
+               [class.selected]="selectedGraph?.id === graph.id"
+               class="graph-item" 
+               (click)="loadGraph(graph)">
+            {{ graph.name }}
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card *ngIf="selectedGraph">
+      <mat-card-header>
+        <mat-card-title>{{ selectedGraph.name }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p *ngIf="selectedGraph.description">{{ selectedGraph.description }}</p>
+        <p>Vertices: {{ selectedGraph.vertices?.length || 0 }}</p>
+        <p>Edges: {{ selectedGraph.edges?.length || 0 }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Main graph visualization area -->
+  <div class="graph-area">
+    <div #graphContainer id="graph-container"></div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="isLoading" class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <!-- No data message -->
+    <div *ngIf="nodes.length === 0 && !isLoading" class="no-data-overlay">
+      <p>No data to display. Select a domain or search for content.</p>
+    </div>
+  </div>
+</div>
